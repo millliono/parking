@@ -1,4 +1,7 @@
 import time 
+import logging
+
+log_file="parking_log.csv"
 
 class ParkingInfo:
     def __init__(self, car_license, driver_name):
@@ -6,15 +9,12 @@ class ParkingInfo:
         self.driver_name = driver_name
         self.start_time = None
 
-    # Define the __eq__ method to compare two ParkingInfo objects
     def __eq__(self, other):
         if isinstance(other, ParkingInfo):
             return self.car_license == other.car_license
         return False
 
     def __repr__(self):
-        # return (f"ParkingInfo(car_license='{self.car_license}', driver_name='{self.driver_name}', "
-        #         f"start_time={self.start_time}, stop_time={self.stop_time})")
         return f"ParkingInfo(car_license='{self.car_license}')"
 
 
@@ -30,7 +30,13 @@ class ParkingSpace:
             if not spot:  # Check if the spot is available (empty)
                 self.spots[index] = ParkingInfo_obj
                 ParkingInfo_obj.start_time  = time.time()
-                print(f"Car parked at spot {index}.")
+                logging._log_entry(log_file, 
+                                   "INBOUND",
+                                   ParkingInfo_obj.car_license,
+                                   ParkingInfo_obj.driver_name,
+                                   index,
+                                   time.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "")
                 return  # Stop once the car is parked
         print("No available spots.")
 
@@ -39,10 +45,18 @@ class ParkingSpace:
         try:
             index = self.spots.index(ParkingInfo_obj)
             self.spots[index] = False  # Mark the spot as empty
-            self.profit += self.calc_profit(ParkingInfo_obj.start_time, time.time())
-            print(f"Car with ID {ParkingInfo_obj} removed from spot {index}.")
+            profit = self.calc_profit(ParkingInfo_obj.start_time, time.time())
+            self.profit += profit
+            logging._log_entry(log_file, 
+                               "OUTBOUND",
+                               ParkingInfo_obj.car_license,
+                               ParkingInfo_obj.driver_name,
+                               index,
+                               "",
+                               time.strftime("%Y-%m-%d %H:%M:%S"),
+                               profit)       
         except :
-            print(f"Car with ID {ParkingInfo_obj} not found.")
+            print(f"Car with license {ParkingInfo_obj} not found.")
 
     def calc_profit(self, start_sec, stop_sec, price=2):
         diff = stop_sec - start_sec
@@ -58,11 +72,6 @@ class ParkingSpace:
 
 
 if __name__ == "__main__":
-
-    # car1 = ParkingInfo(car_license="ABC123", driver_name="Alice", start_time="2025-01-01 08:00", stop_time="2025-01-01 10:00")
-    # car2 = ParkingInfo(car_license="XYZ789", driver_name="Bob", start_time="2025-01-01 09:00", stop_time="2025-01-01 11:00")
-    # car3 = ParkingInfo(car_license="LMN456", driver_name="Charlie", start_time="2025-01-01 10:00", stop_time="2025-01-01 12:00")
-    # car4 = ParkingInfo(car_license="KKP000", driver_name="Charlie", start_time="2025-01-01 10:00", stop_time="2025-01-01 12:00")
 
     car1 = ParkingInfo(car_license="ABC123", driver_name="Alice")
     car2 = ParkingInfo(car_license="XYZ789", driver_name="Bob")
