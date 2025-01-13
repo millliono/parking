@@ -14,6 +14,9 @@ class ParkingApp:
         
         # Create the UI elements
         self.create_ui()
+
+        # To track the selected button
+        self.selected_button = None
         
     def create_ui(self):
         # Frame for parking spots
@@ -52,6 +55,13 @@ class ParkingApp:
         
     def select_spot(self, spot_index):
         """ Select a parking spot when clicking on it """
+        if self.selected_button:
+            # Reset the previous selected button's appearance
+            self.selected_button.config(highlightthickness=0)
+        
+        # Select the new button and add a black border
+        self.selected_button = self.buttons[spot_index]
+        self.selected_button.config(highlightbackground="black", highlightthickness=3)
         self.selected_spot = spot_index
 
     def park_car(self):
@@ -63,12 +73,20 @@ class ParkingApp:
             return
         
         # Create ParkingInfo object
-        car_info = ParkingInfo(license_plate, driver_name)
+        car_info = data.ParkingInfo(license_plate, driver_name)
         
         self.parking_lot.park_car(car_info)
         
         # Update UI to show parked car
         self.update_parking_lot_ui()
+
+        # Reset the selected button's appearance
+        if self.selected_button:
+            self.selected_button.config(highlightthickness=0)
+
+        # Clear the selected spot
+        self.selected_spot = None
+        self.selected_button = None
         
         # Clear the input fields
         self.license_entry.delete(0, tk.END)
@@ -87,6 +105,14 @@ class ParkingApp:
         # Update UI to reflect the car removal
         self.update_parking_lot_ui()
 
+        # Reset the selected button's appearance
+        if self.selected_button:
+            self.selected_button.config(highlightthickness=0)
+
+        # Clear the selected spot
+        self.selected_spot = None
+        self.selected_button = None
+
         # Clear the input fields
         self.license_entry.delete(0, tk.END)
         self.driver_entry.delete(0, tk.END)
@@ -95,7 +121,7 @@ class ParkingApp:
         """ Update the UI to reflect the parking lot status """
         for index, spot in enumerate(self.parking_lot.spots):
             button = self.buttons[index]
-            if isinstance(spot, ParkingInfo):
+            if isinstance(spot, data.ParkingInfo):
                 button.config(bg="red", text=spot.car_license)
             else:
                 button.config(bg="green", text="Empty")
@@ -108,3 +134,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = ParkingApp(root)
     root.mainloop()
+
