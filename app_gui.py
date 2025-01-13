@@ -4,7 +4,7 @@ from tkinter import messagebox
 import data
 
 class ParkingApp:
-    def __init__(self, root, total_spots=10):
+    def __init__(self, root, total_spots=15):
         self.root = root
         self.root.title("Parking Lot System")
         self.total_spots = total_spots
