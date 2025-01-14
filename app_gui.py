@@ -83,8 +83,6 @@ class ParkingApp:
         # Reset the selected button's appearance
         if self.selected_button:
             self.selected_button.config(highlightthickness=0)
-
-        # Clear the selected spot
         self.selected_spot = None
         self.selected_button = None
         
@@ -108,8 +106,6 @@ class ParkingApp:
         # Reset the selected button's appearance
         if self.selected_button:
             self.selected_button.config(highlightthickness=0)
-
-        # Clear the selected spot
         self.selected_spot = None
         self.selected_button = None
 
