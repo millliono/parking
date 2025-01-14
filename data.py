@@ -97,6 +97,7 @@ if __name__ == "__main__":
     car4 = ParkingInfo(car_license="KKP000", driver_name="Charlie", is_sub=False)
     car5 = ParkingInfo(car_license="ZZZ000", driver_name="David", is_sub=True)
     car6 = ParkingInfo(car_license="AAA333", driver_name="Alex", is_sub=True)
+    car7 = ParkingInfo(car_license="AAA333", driver_name="Alex", is_sub=True) # Identical to car6
 
     parking_hourly = ParkingSpace(total_spots=10)
     parking_monthly = ParkingSpace(total_spots=5)
@@ -121,8 +122,8 @@ if __name__ == "__main__":
     parking_monthly.park_car_sub(car6)
     parking_monthly.park_car_sub(car6)
     print(parking_monthly)
-    time.sleep(10) # Necessary time to remove user
-    parking_monthly.park_car_sub(car6)
+    time.sleep(5) # Necessary time to remove user
+    parking_monthly.park_car_sub(car7)
     print(parking_monthly)
 
     print(f"PROFIT: {parking_hourly.profit + parking_monthly.profit}")
