@@ -123,8 +123,8 @@ class ParkingApp:
         rate_type = self.rate_var.get()
         is_sub = rate_type == "monthly"
 
-        # Create ParkingInfo object
-        car_info = data.ParkingInfo(license_plate, driver_name, is_sub)
+        # Retrieve or create ParkingInfo object using CarRegistry
+        car_info = data.CarRegistry.get_or_create(license_plate, driver_name, is_sub)
 
         if is_sub:
             self.parking_monthly.park_car_sub(car_info)
@@ -188,7 +188,9 @@ class ParkingApp:
                 button.config(bg="blue", text="Empty")
 
     def update_profit(self):
-        self.profit_label.config(text=f"Profit: ${(self.parking_monthly.profit + self.parking_hourly.profit):.3f}")
+        self.profit_label.config(
+            text=f"Profit: ${(self.parking_monthly.profit + self.parking_hourly.profit):.3f}"
+        )
 
 
 if __name__ == "__main__":

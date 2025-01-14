@@ -45,7 +45,7 @@ class ParkingSpace:
         try:
             index = self.spots.index(ParkingInfo_obj)
             # Deregister after monthly subscribtion ends.
-            if (time.time() - ParkingInfo_obj.start_time > 2592000): # 60*60*24*30 seconds in a month
+            if (time.time() - ParkingInfo_obj.start_time) > 2592000: # 60*60*24*30 seconds in a month
                 self.spots[index] = False
                 return self.park_car_sub(ParkingInfo_obj)
 
@@ -88,17 +88,29 @@ class ParkingSpace:
                 "\n"
                 f"Available spots: {self.spots.count(False)}")
 
+class CarRegistry:
+    cars = {}
+
+    @staticmethod
+    def get_or_create(car_license, driver_name, is_sub):
+        if car_license not in CarRegistry.cars:
+            CarRegistry.cars[car_license] = ParkingInfo(
+                car_license, driver_name, is_sub
+            )
+        return CarRegistry.cars[car_license]
+
 
 if __name__ == "__main__":
+    # Use CarRegistry to create or retrieve cars
+    car1 = CarRegistry.get_or_create("ABC123", "Alice", False)
+    car2 = CarRegistry.get_or_create("XYZ789", "Bob", False)
+    car3 = CarRegistry.get_or_create("LMN456", "Charlie", False)
+    car4 = CarRegistry.get_or_create("KKP000", "Charlie", False)
+    car5 = CarRegistry.get_or_create("ZZZ000", "David", True)
+    car6 = CarRegistry.get_or_create("AAA333", "Alex", True)
+    car7 = CarRegistry.get_or_create("AAA333", "Alex", True)  # Same license as car6
 
-    car1 = ParkingInfo(car_license="ABC123", driver_name="Alice", is_sub=False)
-    car2 = ParkingInfo(car_license="XYZ789", driver_name="Bob", is_sub=False)
-    car3 = ParkingInfo(car_license="LMN456", driver_name="Charlie", is_sub=False)
-    car4 = ParkingInfo(car_license="KKP000", driver_name="Charlie", is_sub=False)
-    car5 = ParkingInfo(car_license="ZZZ000", driver_name="David", is_sub=True)
-    car6 = ParkingInfo(car_license="AAA333", driver_name="Alex", is_sub=True)
-    car7 = ParkingInfo(car_license="AAA333", driver_name="Alex", is_sub=True) # Identical to car6
-
+    # Create parking spaces
     parking_hourly = ParkingSpace(total_spots=10)
     parking_monthly = ParkingSpace(total_spots=5)
 
@@ -110,20 +122,23 @@ if __name__ == "__main__":
     print(parking_hourly)
 
     time.sleep(3)
-    parking_hourly.remove_car(car2)
+    parking_hourly.remove_car(car2)  # Remove car2
     print(parking_hourly)
 
-    parking_hourly.park_car(car4)
+    parking_hourly.park_car(car4)  # Park car4
     print(parking_hourly)
 
-    parking_monthly.park_car_sub(car5)
+    # Test parking subscribers
+    parking_monthly.park_car_sub(car5)  # Park subscriber car5
     print(parking_monthly)
-    parking_monthly.park_car_sub(car6)
-    parking_monthly.park_car_sub(car6)
-    parking_monthly.park_car_sub(car6)
-    print(parking_monthly)
-    time.sleep(5) # Necessary time to remove user
-    parking_monthly.park_car_sub(car7)
+    parking_monthly.park_car_sub(car6)  # Park subscriber car6
+    parking_monthly.park_car_sub(car6)  # Should not add a new spot
+    parking_monthly.park_car_sub(car6)  # Should not add a new spot
     print(parking_monthly)
 
+    time.sleep(5)  # Simulate passage of time
+    parking_monthly.park_car_sub(car7)  # Same car as car6
+    print(parking_monthly)
+
+    # Calculate and display total profit
     print(f"PROFIT: {parking_hourly.profit + parking_monthly.profit}")
