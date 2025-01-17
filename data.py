@@ -2,13 +2,13 @@ import time
 
 
 class Vehicle:
-    def __init__(self, license, spot=None, driver_name=None, is_sub=False, start=None, stop=None):
+    def __init__(self, license, spot=None, driver_name=None, is_sub=False, start=None, duration=None):
         self.license = license
         self.spot = spot
         self.driver_name = driver_name
         self.is_sub = is_sub
         self.start = start
-        self.stop = stop
+        self.duration = duration
 
     def __eq__(self, other):
         if isinstance(other, Vehicle):
@@ -49,8 +49,10 @@ class ParkingSpace:
         return False
 
     def rent_spot(self, vehicle):
-        vehicle.is_sub = True
-        self.subscription[vehicle.spot]["vehicle"] = vehicle
+        if vehicle.spot > 0 and self.subscription[vehicle.spot]["vehicle"] == False:
+            self.subscription[vehicle.spot]["vehicle"] = vehicle
+            return True
+        return False
 
     def remove_car(self, spot, spot_type):
         if spot_type == "monthly":

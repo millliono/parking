@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+import time
 
 import data
 
@@ -67,20 +68,40 @@ class ParkingApp:
         self.form_frame.grid(row=2, column=0, padx=10, pady=10)
 
         tk.Label(self.form_frame, text="License Plate:").grid(row=0, column=0)
-        self.license_entry = tk.Entry(self.form_frame)
-        self.license_entry.grid(row=0, column=1)
+        self.license1_entry = tk.Entry(self.form_frame)
+        self.license1_entry.grid(row=0, column=1)
 
-        # tk.Label(self.form_frame, text="Driver Name:").grid(row=1, column=0)
-        # self.driver_entry = tk.Entry(self.form_frame)
-        # self.driver_entry.grid(row=1, column=1)
+        # Rent Spot Form
+        self.rent_form_frame = tk.Frame(self.root)
+        # Adjust column to be next to the form
+        self.rent_form_frame.grid(row=2, column=1, padx=10, pady=10)
 
+        tk.Label(self.rent_form_frame, text="License Plate:").grid(
+            row=0, column=0)
+        self.license2_entry = tk.Entry(self.rent_form_frame)
+        self.license2_entry.grid(row=0, column=1)
+
+        tk.Label(self.rent_form_frame, text="Driver Name:").grid(
+            row=1, column=0)
+        self.driver_name_entry = tk.Entry(self.rent_form_frame)
+        self.driver_name_entry.grid(row=1, column=1)
+
+        tk.Label(self.rent_form_frame, text="Spot:").grid(row=2, column=0)
+        self.spot_entry = tk.Entry(self.rent_form_frame)
+        self.spot_entry.grid(row=2, column=1)
+
+        tk.Label(self.rent_form_frame, text="Duration (months):").grid(
+            row=3, column=0)
+        self.duration_entry = tk.Entry(self.rent_form_frame)
+        self.duration_entry.grid(row=3, column=1)
+
+        self.rent_button = tk.Button(
+            self.rent_form_frame, text="Rent Spot", command=self.rent_spot
+        )
+        self.rent_button.grid(row=4, column=0, columnspan=2, pady=5)
+
+        # Radio buttons for selecting parking rate
         self.rate_var = tk.StringVar(value="hourly")
-        tk.Radiobutton(
-            self.form_frame, text="Hourly Rate", variable=self.rate_var, value="hourly"
-        ).grid(row=2, column=0)
-        tk.Radiobutton(
-            self.form_frame, text="Monthly Rate", variable=self.rate_var, value="monthly"
-        ).grid(row=2, column=1)
 
         self.park_button = tk.Button(
             self.form_frame, text="Park Car", command=self.park_car
@@ -91,14 +112,6 @@ class ParkingApp:
             self.form_frame, text="Remove Car", command=self.remove_car
         )
         self.remove_button.grid(row=4, column=0, columnspan=2)
-
-        # # Profit label
-        # self.profit_label = tk.Label(
-        #     self.root,
-        #     text=f"Profit: ${self.parking_hourly.profit +
-        #                      self.parking_monthly.profit:.2f}",
-        # )
-        # self.profit_label.grid(row=3, column=0, padx=10, pady=10)
 
     def select_spot(self, spot_index, spot_type):
         if self.selected_button:
@@ -113,9 +126,8 @@ class ParkingApp:
             highlightbackground="black", highlightthickness=3)
         self.selected_spot = (spot_type, spot_index)
 
-
     def park_car(self):
-        license_plate = self.license_entry.get()
+        license_plate = self.license1_entry.get()
 
         if not license_plate:
             messagebox.showerror(
@@ -128,8 +140,6 @@ class ParkingApp:
         self.update_monthly_parking_ui()
         self.update_hourly_parking_ui()
 
-        # self.update_profit()
-
         # Reset the selected button's appearance
         if self.selected_button:
             self.selected_button.config(highlightthickness=0)
@@ -137,19 +147,18 @@ class ParkingApp:
         self.selected_button = None
 
         # Clear the input fields
-        self.license_entry.delete(0, tk.END)
+        self.license1_entry.delete(0, tk.END)
 
     def remove_car(self):
         if self.selected_spot is None:
             messagebox.showerror("Error", "Please select a parking spot.")
             return
-        
+
         (spot_type, spot_index) = self.selected_spot
         self.parking.remove_car(spot_index, spot_type)
 
         self.update_monthly_parking_ui()
         self.update_hourly_parking_ui()
-        # self.update_profit()
 
         # Reset the selected button's appearance
         if self.selected_button:
@@ -157,8 +166,35 @@ class ParkingApp:
         self.selected_spot = None
         self.selected_button = None
 
-        # Clear the input fields
-        self.license_entry.delete(0, tk.END)
+    def rent_spot(self):
+        license = self.license2_entry.get()
+        driver_name = self.driver_name_entry.get()
+        spot = int(self.spot_entry.get())
+        duration = int(self.duration_entry.get())
+
+        # if not license or not driver_name or not spot or not duration:
+        #     messagebox.showerror("Error", "Please fill out all fields.")
+        #     return
+
+        # Assuming the parking class has a rent method
+        vec = data.Vehicle(license, spot, driver_name,
+                           True,  time.time(), duration)
+        
+        if self.parking.rent_spot(vec):
+            messagebox.showinfo("Success", "Spot rented successfully!")
+        else:
+            messagebox.showerror(
+                "Error", "Failed to rent the spot. Please try again.")
+            
+        self.update_hourly_parking_ui()
+        self.update_monthly_parking_ui()
+
+        # Clear the rent form
+        self.license2_entry.delete(0, tk.END)
+        self.driver_name_entry.delete(0, tk.END)
+        self.spot_entry.delete(0, tk.END)
+        self.spot_entry.delete(0, tk.END)
+        self.duration_entry.delete(0, tk.END)
 
     def update_hourly_parking_ui(self):
         for index, spot in enumerate(self.parking.hourly):
@@ -171,7 +207,7 @@ class ParkingApp:
     def update_monthly_parking_ui(self):
         for index, spot in enumerate(self.parking.subscription):
             button = self.monthly_buttons[index]
-            if isinstance(spot, data.Vehicle):
+            if isinstance(spot["vehicle"], data.Vehicle):
                 button.config(bg="grey", text=spot["vehicle"].license)
             else:
                 button.config(bg="blue", text="Empty")
