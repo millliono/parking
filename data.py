@@ -28,7 +28,7 @@ class ParkingSpace:
 
     def park(self, license):
         reg = self.find_registered(license)
-        if reg:
+        if reg is not False:
             self.subscription[reg]["occupied"] = True
         else:
             # Park a car in the first available spot
@@ -70,31 +70,3 @@ class ParkingSpace:
                 "\n"
                 f"Subscription({', '.join(repr(item) for item in self.subscription)})")
 
-
-if __name__ == "__main__":
-    parking_space = ParkingSpace()
-
-    # Create some vehicles
-    vehicle1 = Vehicle(license="ABC123", driver_name="Alice")
-    vehicle2 = Vehicle(license="XYZ789", driver_name="Bob")
-    vehicle3 = Vehicle(license="ZZY998", driver_name="Patty")
-    sub_vehicle1 = Vehicle(license="SUB001", spot=0,
-                           is_sub=True, driver_name="Charlie")
-    sub_vehicle2 = Vehicle(license="SUB002", spot=2,
-                           is_sub=True, driver_name="Noris")
-
-    parking_space.park(vehicle1.license)
-    parking_space.park(vehicle2.license)
-    parking_space.park(vehicle3.license)
-
-    parking_space.rent_spot(sub_vehicle1)
-    parking_space.rent_spot(sub_vehicle2)
-
-    print(parking_space)
-
-    parking_space.remove_car(sub_vehicle1.spot, "subscription")
-
-    print(parking_space)
-
-    print("\nFinal parking space status:")
-    print(parking_space)

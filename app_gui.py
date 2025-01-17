@@ -179,11 +179,15 @@ class ParkingApp:
     def rent_spot(self):
         license = self.license2_entry.get()
         driver_name = self.driver_name_entry.get()
-        spot = int(self.spot_entry.get())
-        duration = int(self.duration_entry.get())
+        spot = self.spot_entry.get()
+        duration = self.duration_entry.get()
 
-        vec = data.Vehicle(license, spot, driver_name,
-                           True, time.time(), duration)
+        if not license or not driver_name or not spot or not duration:
+            messagebox.showerror("Error", "Please fill the form.")
+            return
+
+        vec = data.Vehicle(license, int(spot), driver_name,
+                           True, time.time(), int(duration))
 
         if self.parking.rent_spot(vec):
             messagebox.showinfo("Success", "Spot rented successfully!")
