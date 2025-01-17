@@ -51,7 +51,9 @@ class ParkingApp:
             row=0, column=0, columnspan=5
         )
         self.monthly_buttons = []
+        self.monthly_legends = []  # List to store legend labels
         for i in range(self.monthly_spots):
+            # Monthly buttons
             button = tk.Button(
                 self.monthly_frame,
                 text="Empty",
@@ -63,6 +65,12 @@ class ParkingApp:
             button.grid(row=(i // 5) + 1, column=i % 5, padx=5, pady=5)
             self.monthly_buttons.append(button)
 
+            # Legend labels
+            legend = tk.Label(self.monthly_frame, text="", font=("Arial", 11))
+            legend.grid(row=(i // 5) + 2, column=i %
+                        5)  # Place legend below buttons
+            self.monthly_legends.append(legend)
+
         # Entry form for license plate and driver name
         self.form_frame = tk.Frame(self.root)
         self.form_frame.grid(row=2, column=0, padx=10, pady=10)
@@ -73,7 +81,6 @@ class ParkingApp:
 
         # Rent Spot Form
         self.rent_form_frame = tk.Frame(self.root)
-        # Adjust column to be next to the form
         self.rent_form_frame.grid(row=2, column=1, padx=10, pady=10)
 
         tk.Label(self.rent_form_frame, text="License Plate:").grid(
@@ -100,9 +107,6 @@ class ParkingApp:
         )
         self.rent_button.grid(row=4, column=0, columnspan=2, pady=5)
 
-        # Radio buttons for selecting parking rate
-        self.rate_var = tk.StringVar(value="hourly")
-
         self.park_button = tk.Button(
             self.form_frame, text="Park Car", command=self.park_car
         )
@@ -117,11 +121,17 @@ class ParkingApp:
         if self.selected_button:
             self.selected_button.config(highlightthickness=0)
 
-        if spot_type == "hourly":
+        if spot_type == "hourly" and spot_index < len(self.hourly_buttons):
             self.selected_button = self.hourly_buttons[spot_index]
-        elif spot_type == "monthly":
+        elif spot_type == "subscription" and spot_index < len(self.monthly_buttons):
             self.selected_button = self.monthly_buttons[spot_index]
+        else:
+            messagebox.showerror("Error", "Invalid spot selected.")
+            self.selected_button = None
+            self.selected_spot = None
+            return
 
+        # Highlight the selected button
         self.selected_button.config(
             highlightbackground="black", highlightthickness=3)
         self.selected_spot = (spot_type, spot_index)
@@ -172,27 +182,21 @@ class ParkingApp:
         spot = int(self.spot_entry.get())
         duration = int(self.duration_entry.get())
 
-        # if not license or not driver_name or not spot or not duration:
-        #     messagebox.showerror("Error", "Please fill out all fields.")
-        #     return
-
-        # Assuming the parking class has a rent method
         vec = data.Vehicle(license, spot, driver_name,
-                           True,  time.time(), duration)
-        
+                           True, time.time(), duration)
+
         if self.parking.rent_spot(vec):
             messagebox.showinfo("Success", "Spot rented successfully!")
         else:
             messagebox.showerror(
                 "Error", "Failed to rent the spot. Please try again.")
-            
+
         self.update_hourly_parking_ui()
         self.update_monthly_parking_ui()
 
         # Clear the rent form
         self.license2_entry.delete(0, tk.END)
         self.driver_name_entry.delete(0, tk.END)
-        self.spot_entry.delete(0, tk.END)
         self.spot_entry.delete(0, tk.END)
         self.duration_entry.delete(0, tk.END)
 
@@ -207,10 +211,16 @@ class ParkingApp:
     def update_monthly_parking_ui(self):
         for index, spot in enumerate(self.parking.subscription):
             button = self.monthly_buttons[index]
+            legend = self.monthly_legends[index]
             if isinstance(spot["vehicle"], data.Vehicle):
-                button.config(bg="grey", text=spot["vehicle"].license)
+                if spot["occupied"]:
+                    button.config(bg="grey", text=spot["vehicle"].license)
+                else:
+                    button.config(bg="blue", text="Empty")
+                legend.config(text=spot["vehicle"].license)  # Update legend
             else:
                 button.config(bg="blue", text="Empty")
+                legend.config(text="")  # Clear legend
 
     def update_profit(self):
         self.profit_label.config(

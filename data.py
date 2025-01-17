@@ -49,13 +49,13 @@ class ParkingSpace:
         return False
 
     def rent_spot(self, vehicle):
-        if vehicle.spot > 0 and self.subscription[vehicle.spot]["vehicle"] == False:
+        if vehicle.spot >= 0 and self.subscription[vehicle.spot]["vehicle"] == False:
             self.subscription[vehicle.spot]["vehicle"] = vehicle
             return True
         return False
 
     def remove_car(self, spot, spot_type):
-        if spot_type == "monthly":
+        if spot_type == "subscription":
             self.subscription[spot]["occupied"] = False
         elif spot_type == "hourly":
             self.hourly[spot] = False  # Mark the spot as empty
