@@ -1,11 +1,10 @@
 class Vehicle:
-    def __init__(self, license, spot=None, driver_name=None, is_sub=False, datetime=None, duration=None):
+    def __init__(self, license, spot=None, driver_name=None, is_sub=False, datetime=None):
         self.license = license
         self.spot = spot
         self.driver_name = driver_name
         self.is_sub = is_sub
         self.datetime = datetime
-        self.duration = duration
 
     def __eq__(self, other):
         if isinstance(other, Vehicle):
@@ -15,13 +14,13 @@ class Vehicle:
     def __repr__(self):
         return f"Vehicle(license='{self.license}')"
 
-
 class ParkingSpace:
     def __init__(self):
         # Initialize a parking space with all spots empty
         self.hourly = [False] * 15  # False means empty
         self.subscription = [
             {"occupied": False, "vehicle": False} for _ in range(5)]
+        self.profit = 0.0
 
     def park(self, license, datetime):
         reg = self.find_registered(license)
@@ -46,9 +45,10 @@ class ParkingSpace:
                 return index
         return False
 
-    def rent_spot(self, vehicle):
+    def rent_spot(self, vehicle, duration):
         if vehicle.spot >= 0 and self.subscription[vehicle.spot]["vehicle"] == False:
             self.subscription[vehicle.spot]["vehicle"] = vehicle
+            self.profit += 50 * duration
             return True
         return False
 
@@ -59,14 +59,8 @@ class ParkingSpace:
             self.subscription[spot]["occupied"] = False
         elif spot_type == "hourly":
             time = datetime - self.hourly[spot].datetime
-            self.hourly[spot] = False  # Mark the spot as empty
+            self.hourly[spot] = False
+            self.profit += self.calc_profit(time.total_seconds())
 
-    def calc_profit(self, start_sec, stop_sec, price=2):
-        diff = stop_sec - start_sec
-        return (diff / 3600) * price
-
-    def __repr__(self):
-        # Return a string representation of the parking space status
-        return (f"Hourly({', '.join(repr(item) for item in self.hourly)}), "
-                "\n"
-                f"Subscription({', '.join(repr(item) for item in self.subscription)})")
+    def calc_profit(self, seconds, price=2):
+        return (seconds / 3600) * price

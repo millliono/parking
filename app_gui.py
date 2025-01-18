@@ -12,13 +12,9 @@ class ParkingApp:
         self.hourly_spots = 15
         self.monthly_spots = 5
 
-        # Create parking lot instances
         self.parking = data.ParkingSpace()
-
-        # Create the UI elements
         self.create_ui()
 
-        # To track the selected button
         self.selected_button = None
         self.selected_spot = None
 
@@ -163,6 +159,19 @@ class ParkingApp:
         )
         self.rent_button.grid(row=5, column=0, columnspan=2, pady=5)
 
+        # Add profit display frame
+        self.profit_frame = tk.Frame(self.root)
+        self.profit_frame.grid(row=3, column=0, columnspan=2, pady=10)
+
+        # Create and style the profit label
+        self.profit_label = tk.Label(
+            self.profit_frame,
+            text=f"Total Profit: ${self.parking.profit}",
+            font=("Arial", 13, "bold"),
+            fg="dark red",
+        )
+        self.profit_label.pack()
+
     def select_spot(self, spot_index, spot_type):
         if self.selected_button:
             self.selected_button.config(highlightthickness=0)
@@ -231,6 +240,7 @@ class ParkingApp:
 
         self.update_monthly_parking_ui()
         self.update_hourly_parking_ui()
+        self.update_profit()
 
         # Reset the selected button's appearance
         if self.selected_button:
@@ -252,17 +262,16 @@ class ParkingApp:
             messagebox.showerror("Error", "Please fill the form.")
             return
 
-        vec = data.Vehicle(
-            license, int(spot), driver_name, True, time.time(), int(duration)
-        )
+        vec = data.Vehicle(license, int(spot), driver_name, True, time.time())
 
-        if self.parking.rent_spot(vec):
+        if self.parking.rent_spot(vec, int(duration)):
             messagebox.showinfo("Success", "Spot rented successfully!")
         else:
             messagebox.showerror("Error", "Failed to rent the spot. Please try again.")
 
         self.update_hourly_parking_ui()
         self.update_monthly_parking_ui()
+        self.update_profit()
 
         # Clear the rent form
         self.license3_entry.delete(0, tk.END)
@@ -294,10 +303,7 @@ class ParkingApp:
                 legend.config(text="")  # Clear legend
 
     def update_profit(self):
-        self.profit_label.config(
-            text=f"Profit: ${(self.parking_monthly.profit +
-                              self.parking_hourly.profit):.3f}"
-        )
+        self.profit_label.config(text=f"Total Profit: ${self.parking.profit:.2f}")
 
 
 if __name__ == "__main__":
