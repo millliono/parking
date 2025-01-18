@@ -1,8 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 import time
-
 import data
+from datetime import datetime
 
 
 class ParkingApp:
@@ -79,6 +79,24 @@ class ParkingApp:
         self.license1_entry = tk.Entry(self.form_frame)
         self.license1_entry.grid(row=0, column=1)
 
+        tk.Label(self.form_frame, text="Date (YYYY-MM-DD):").grid(row=1, column=0)
+        self.date_entry = tk.Entry(self.form_frame)
+        self.date_entry.grid(row=1, column=1)
+
+        tk.Label(self.form_frame, text="Time (HH:MM):").grid(row=2, column=0)
+        self.time_entry = tk.Entry(self.form_frame)
+        self.time_entry.grid(row=2, column=1)
+
+        self.park_button = tk.Button(
+            self.form_frame, text="Park Car", command=self.park_car
+        )
+        self.park_button.grid(row=3, column=0, columnspan=2, pady=5)
+
+        self.remove_button = tk.Button(
+            self.form_frame, text="Remove Car", command=self.remove_car
+        )
+        self.remove_button.grid(row=4, column=0, columnspan=2)
+
         # Rent Spot Form
         self.rent_form_frame = tk.Frame(self.root)
         self.rent_form_frame.grid(row=2, column=1, padx=10, pady=10)
@@ -107,16 +125,6 @@ class ParkingApp:
         )
         self.rent_button.grid(row=4, column=0, columnspan=2, pady=5)
 
-        self.park_button = tk.Button(
-            self.form_frame, text="Park Car", command=self.park_car
-        )
-        self.park_button.grid(row=3, column=0, columnspan=2, pady=5)
-
-        self.remove_button = tk.Button(
-            self.form_frame, text="Remove Car", command=self.remove_car
-        )
-        self.remove_button.grid(row=4, column=0, columnspan=2)
-
     def select_spot(self, spot_index, spot_type):
         if self.selected_button:
             self.selected_button.config(highlightthickness=0)
@@ -138,14 +146,16 @@ class ParkingApp:
 
     def park_car(self):
         license_plate = self.license1_entry.get()
+        date_str = self.date_entry.get()
+        time_str = self.time_entry.get()
 
-        if not license_plate:
-            messagebox.showerror(
-                "Error", "Please provide license plate."
-            )
-            return
+        if date_str and time_str:
+            datetime_str = f"{date_str} {time_str}" 
+            dt_object = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+        else:
+            dt_object = datetime.now()
 
-        self.parking.park(license_plate)
+        self.parking.park(license_plate, dt_object)
 
         self.update_monthly_parking_ui()
         self.update_hourly_parking_ui()
@@ -158,6 +168,8 @@ class ParkingApp:
 
         # Clear the input fields
         self.license1_entry.delete(0, tk.END)
+        self.date_entry.delete(0, tk.END)
+        self.time_entry.delete(0, tk.END)
 
     def remove_car(self):
         if self.selected_spot is None:

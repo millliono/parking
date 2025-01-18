@@ -2,12 +2,12 @@ import time
 
 
 class Vehicle:
-    def __init__(self, license, spot=None, driver_name=None, is_sub=False, start=None, duration=None):
+    def __init__(self, license, spot=None, driver_name=None, is_sub=False, datetime=None, duration=None):
         self.license = license
         self.spot = spot
         self.driver_name = driver_name
         self.is_sub = is_sub
-        self.start = start
+        self.datetime = datetime
         self.duration = duration
 
     def __eq__(self, other):
@@ -26,10 +26,11 @@ class ParkingSpace:
         self.subscription = [
             {"occupied": False, "vehicle": False} for _ in range(5)]
 
-    def park(self, license):
+    def park(self, license, datetime):
         reg = self.find_registered(license)
         if reg is not False:
             self.subscription[reg]["occupied"] = True
+            self.subscription[reg]["vehicle"].datetime = datetime
         else:
             # Park a car in the first available spot
             vec = Vehicle(license)
@@ -37,7 +38,7 @@ class ParkingSpace:
                 if not spot:  # Check if the spot is available (empty)
                     self.hourly[index] = vec
                     vec.spot = index
-                    vec.start = time.time()
+                    vec.datetime = datetime
                     return  # Stop once the car is parked
             print("No available spots.")
 
