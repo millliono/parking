@@ -18,9 +18,8 @@ class ParkingSpace:
     def __init__(self):
         # Initialize a parking space with all spots empty
         self.hourly = [False] * 15  # False means empty
-        self.subscription = [
-            {"occupied": False, "vehicle": False} for _ in range(5)]
-        self.profit = 0.0
+        self.subscription = [{"occupied": False, "vehicle": False} for _ in range(5)]
+        self.profit = {} 
 
     def park(self, license, datetime):
         reg = self.find_registered(license)
@@ -48,7 +47,8 @@ class ParkingSpace:
     def rent_spot(self, vehicle, duration):
         if vehicle.spot >= 0 and self.subscription[vehicle.spot]["vehicle"] == False:
             self.subscription[vehicle.spot]["vehicle"] = vehicle
-            self.profit += 50 * duration
+            date_key = vehicle.datetime.date().isoformat()
+            self.profit[date_key] = self.profit.get(date_key, 0) + 50 * duration
             return True
         return False
 
@@ -60,7 +60,9 @@ class ParkingSpace:
         elif spot_type == "hourly":
             time = datetime - self.hourly[spot].datetime
             self.hourly[spot] = False
-            self.profit += self.calc_profit(time.total_seconds())
+            date_key = datetime.date().isoformat()
+            current_profit = self.calc_profit(time.total_seconds())
+            self.profit[date_key] = self.profit.get(date_key, 0) + current_profit
 
     def calc_profit(self, seconds, price=2):
         return (seconds / 3600) * price

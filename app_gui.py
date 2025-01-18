@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-import time
+from tkinter import messagebox
 import data
 from datetime import datetime
 
@@ -159,18 +158,27 @@ class ParkingApp:
         )
         self.rent_button.grid(row=5, column=0, columnspan=2, pady=5)
 
-        # Add profit display frame
         self.profit_frame = tk.Frame(self.root)
         self.profit_frame.grid(row=3, column=0, columnspan=2, pady=10)
 
-        # Create and style the profit label
-        self.profit_label = tk.Label(
-            self.profit_frame,
-            text=f"Total Profit: ${self.parking.profit}",
-            font=("Arial", 13, "bold"),
-            fg="dark red",
-        )
-        self.profit_label.pack()
+        self.profit_text = tk.Text(self.profit_frame, height=5, width=40)
+        self.profit_text.pack(side=tk.LEFT)
+
+        scrollbar = tk.Scrollbar(self.profit_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.profit_text.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.profit_text.yview)
+
+    def update_profit(self):
+        self.profit_text.delete(1.0, tk.END)
+
+        total_profit = sum(self.parking.profit.values())
+        self.profit_text.insert(tk.END, f"Total Profit: ${total_profit:.2f}\n\n")
+
+        self.profit_text.insert(tk.END, "Daily Breakdown:\n")
+        for date, amount in sorted(self.parking.profit.items()):
+            self.profit_text.insert(tk.END, f"{date}: ${amount:.2f}\n")
 
     def select_spot(self, spot_index, spot_type):
         if self.selected_button:
@@ -262,16 +270,21 @@ class ParkingApp:
             messagebox.showerror("Error", "Please fill the form.")
             return
 
-        vec = data.Vehicle(license, int(spot), driver_name, True, time.time())
+        vec = data.Vehicle(
+            license,
+            int(spot),
+            driver_name,
+            True,
+            datetime.strptime(date_str, "%Y-%m-%d"),
+        )
 
         if self.parking.rent_spot(vec, int(duration)):
             messagebox.showinfo("Success", "Spot rented successfully!")
+            self.update_hourly_parking_ui()
+            self.update_monthly_parking_ui()
+            self.update_profit()  # Update profit display
         else:
             messagebox.showerror("Error", "Failed to rent the spot. Please try again.")
-
-        self.update_hourly_parking_ui()
-        self.update_monthly_parking_ui()
-        self.update_profit()
 
         # Clear the rent form
         self.license3_entry.delete(0, tk.END)
@@ -297,13 +310,11 @@ class ParkingApp:
                     button.config(bg="grey", text=spot["vehicle"].license)
                 else:
                     button.config(bg="blue", text="Empty")
-                legend.config(text=spot["vehicle"].license)  # Update legend
+                legend.config(text=spot["vehicle"].license)  
             else:
                 button.config(bg="blue", text="Empty")
-                legend.config(text="")  # Clear legend
+                legend.config(text="") 
 
-    def update_profit(self):
-        self.profit_label.config(text=f"Total Profit: ${self.parking.profit:.2f}")
 
 
 if __name__ == "__main__":
