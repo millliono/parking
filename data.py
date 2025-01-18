@@ -1,6 +1,3 @@
-import time
-
-
 class Vehicle:
     def __init__(self, license, spot=None, driver_name=None, is_sub=False, datetime=None, duration=None):
         self.license = license
@@ -55,10 +52,13 @@ class ParkingSpace:
             return True
         return False
 
-    def remove_car(self, spot, spot_type):
+    def remove_car(self, spot, spot_type, datetime):
+        time = 0
         if spot_type == "subscription":
+            time = datetime - self.subscription[spot]["vehicle"].datetime
             self.subscription[spot]["occupied"] = False
         elif spot_type == "hourly":
+            time = datetime - self.hourly[spot].datetime
             self.hourly[spot] = False  # Mark the spot as empty
 
     def calc_profit(self, start_sec, stop_sec, price=2):
@@ -70,4 +70,3 @@ class ParkingSpace:
         return (f"Hourly({', '.join(repr(item) for item in self.hourly)}), "
                 "\n"
                 f"Subscription({', '.join(repr(item) for item in self.subscription)})")
-

@@ -213,12 +213,21 @@ class ParkingApp:
         self.time1_entry.delete(0, tk.END)
 
     def remove_car(self):
+        date_str = self.date2_entry.get()
+        time_str = self.time2_entry.get()
+
         if self.selected_spot is None:
             messagebox.showerror("Error", "Please select a parking spot.")
             return
 
+        if date_str and time_str:
+            datetime_str = f"{date_str} {time_str}"
+            dt_object = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+        else:
+            dt_object = datetime.now()
+
         (spot_type, spot_index) = self.selected_spot
-        self.parking.remove_car(spot_index, spot_type)
+        self.parking.remove_car(spot_index, spot_type, dt_object)
 
         self.update_monthly_parking_ui()
         self.update_hourly_parking_ui()
@@ -229,13 +238,17 @@ class ParkingApp:
         self.selected_spot = None
         self.selected_button = None
 
+        self.date2_entry.delete(0, tk.END)
+        self.time2_entry.delete(0, tk.END)
+
     def rent_spot(self):
         license = self.license3_entry.get()
         driver_name = self.driver_name_entry.get()
         spot = self.spot_entry.get()
+        date_str = self.date3_entry.get()
         duration = self.duration_entry.get()
 
-        if not license or not driver_name or not spot or not duration:
+        if not license or not driver_name or not spot or not date_str or not duration:
             messagebox.showerror("Error", "Please fill the form.")
             return
 
@@ -255,6 +268,7 @@ class ParkingApp:
         self.license3_entry.delete(0, tk.END)
         self.driver_name_entry.delete(0, tk.END)
         self.spot_entry.delete(0, tk.END)
+        self.date3_entry.delete(0, tk.END)
         self.duration_entry.delete(0, tk.END)
 
     def update_hourly_parking_ui(self):
