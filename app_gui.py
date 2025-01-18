@@ -25,7 +25,7 @@ class ParkingApp:
     def create_ui(self):
         # Frame for hourly parking spots
         self.hourly_frame = tk.Frame(self.root)
-        self.hourly_frame.grid(row=0, column=0, padx=10, pady=10)
+        self.hourly_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
         tk.Label(self.hourly_frame, text="Hourly Parking", font=("Arial", 12)).grid(
             row=0, column=0, columnspan=5
@@ -36,94 +36,132 @@ class ParkingApp:
                 self.hourly_frame,
                 text="Empty",
                 bg="green",
-                width=10,
-                height=3,
-                command=lambda i=i: self.select_spot(i, "hourly")
+                width=8,  # Reduced width
+                height=2,  # Reduced height
+                command=lambda i=i: self.select_spot(i, "hourly"),
             )
-            button.grid(row=(i // 5) + 1, column=i % 5, padx=5, pady=5)
+            button.grid(
+                row=(i // 5) + 1, column=i % 5, padx=2, pady=2
+            )  # Reduced padding
             self.hourly_buttons.append(button)
 
         # Frame for monthly parking spots
         self.monthly_frame = tk.Frame(self.root)
-        self.monthly_frame.grid(row=1, column=0, padx=10, pady=10)
+        self.monthly_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
         tk.Label(self.monthly_frame, text="Monthly Parking", font=("Arial", 12)).grid(
             row=0, column=0, columnspan=5
         )
         self.monthly_buttons = []
-        self.monthly_legends = []  # List to store legend labels
+        self.monthly_legends = []
         for i in range(self.monthly_spots):
-            # Monthly buttons
             button = tk.Button(
                 self.monthly_frame,
                 text="Empty",
                 bg="blue",
-                width=10,
-                height=3,
+                width=8,  # Reduced width
+                height=2,  # Reduced height
                 command=lambda i=i: self.select_spot(i, "subscription"),
             )
-            button.grid(row=(i // 5) + 1, column=i % 5, padx=5, pady=5)
+            button.grid(
+                row=(i // 5) + 1, column=i % 5, padx=2, pady=2
+            )  # Reduced padding
             self.monthly_buttons.append(button)
 
-            # Legend labels
-            legend = tk.Label(self.monthly_frame, text="", font=("Arial", 11))
-            legend.grid(row=(i // 5) + 2, column=i %
-                        5)  # Place legend below buttons
+            legend = tk.Label(
+                self.monthly_frame, text="", font=("Arial", 10)
+            )  # Smaller font
+            legend.grid(row=(i // 5) + 2, column=i % 5)
             self.monthly_legends.append(legend)
 
-        # Entry form for license plate and driver name
-        self.form_frame = tk.Frame(self.root)
-        self.form_frame.grid(row=2, column=0, padx=10, pady=10)
+        # Create a frame for all forms
+        self.forms_frame = tk.Frame(self.root)
+        self.forms_frame.grid(row=2, column=0, columnspan=2, pady=5)
 
-        tk.Label(self.form_frame, text="License Plate:").grid(row=0, column=0)
-        self.license1_entry = tk.Entry(self.form_frame)
+        # Park Car Form (Left side)
+        self.park_form_frame = tk.Frame(self.forms_frame)
+        self.park_form_frame.grid(row=0, column=0, padx=5)
+
+        tk.Label(self.park_form_frame, text="License Plate:").grid(
+            row=0, column=0, sticky="e"
+        )
+        self.license1_entry = tk.Entry(self.park_form_frame, width=15)
         self.license1_entry.grid(row=0, column=1)
 
-        tk.Label(self.form_frame, text="Date (YYYY-MM-DD):").grid(row=1, column=0)
-        self.date_entry = tk.Entry(self.form_frame)
-        self.date_entry.grid(row=1, column=1)
+        tk.Label(self.park_form_frame, text="Date (YYYY-MM-DD):").grid(
+            row=1, column=0, sticky="e"
+        )
+        self.date1_entry = tk.Entry(self.park_form_frame, width=15)
+        self.date1_entry.grid(row=1, column=1)
 
-        tk.Label(self.form_frame, text="Time (HH:MM):").grid(row=2, column=0)
-        self.time_entry = tk.Entry(self.form_frame)
-        self.time_entry.grid(row=2, column=1)
+        tk.Label(self.park_form_frame, text="Time (HH:MM):").grid(
+            row=2, column=0, sticky="e"
+        )
+        self.time1_entry = tk.Entry(self.park_form_frame, width=15)
+        self.time1_entry.grid(row=2, column=1)
 
         self.park_button = tk.Button(
-            self.form_frame, text="Park Car", command=self.park_car
+            self.park_form_frame, text="Park Car", command=self.park_car, width=12
         )
-        self.park_button.grid(row=3, column=0, columnspan=2, pady=5)
+        self.park_button.grid(row=3, column=0, columnspan=2, pady=2)
+
+        # Remove car Form (Middle)
+        self.remove_form_frame = tk.Frame(self.forms_frame)
+        self.remove_form_frame.grid(row=0, column=1, padx=5)
+
+        tk.Label(self.remove_form_frame, text="Date (YYYY-MM-DD):").grid(
+            row=1, column=0, sticky="e"
+        )
+        self.date2_entry = tk.Entry(self.remove_form_frame, width=15)
+        self.date2_entry.grid(row=1, column=1)
+
+        tk.Label(self.remove_form_frame, text="Time (HH:MM):").grid(
+            row=2, column=0, sticky="e"
+        )
+        self.time2_entry = tk.Entry(self.remove_form_frame, width=15)
+        self.time2_entry.grid(row=2, column=1)
 
         self.remove_button = tk.Button(
-            self.form_frame, text="Remove Car", command=self.remove_car
+            self.remove_form_frame, text="Remove Car", command=self.remove_car, width=12
         )
-        self.remove_button.grid(row=4, column=0, columnspan=2)
+        self.remove_button.grid(row=4, column=0, columnspan=2, pady=2)
 
-        # Rent Spot Form
-        self.rent_form_frame = tk.Frame(self.root)
-        self.rent_form_frame.grid(row=2, column=1, padx=10, pady=10)
+        # Rent Spot Form (Right side)
+        self.rent_form_frame = tk.Frame(self.forms_frame)
+        self.rent_form_frame.grid(row=0, column=2, padx=5)
 
         tk.Label(self.rent_form_frame, text="License Plate:").grid(
-            row=0, column=0)
-        self.license2_entry = tk.Entry(self.rent_form_frame)
-        self.license2_entry.grid(row=0, column=1)
+            row=0, column=0, sticky="e"
+        )
+        self.license3_entry = tk.Entry(self.rent_form_frame, width=15)
+        self.license3_entry.grid(row=0, column=1)
 
         tk.Label(self.rent_form_frame, text="Driver Name:").grid(
-            row=1, column=0)
-        self.driver_name_entry = tk.Entry(self.rent_form_frame)
+            row=1, column=0, sticky="e"
+        )
+        self.driver_name_entry = tk.Entry(self.rent_form_frame, width=15)
         self.driver_name_entry.grid(row=1, column=1)
 
-        tk.Label(self.rent_form_frame, text="Spot:").grid(row=2, column=0)
-        self.spot_entry = tk.Entry(self.rent_form_frame)
+        tk.Label(self.rent_form_frame, text="Spot:").grid(row=2, column=0, sticky="e")
+        self.spot_entry = tk.Entry(self.rent_form_frame, width=15)
         self.spot_entry.grid(row=2, column=1)
 
+        tk.Label(self.rent_form_frame, text="Start Date (YYYY-MM-DD):").grid(
+            row=3, column=0, sticky="e"
+        )
+        self.date3_entry = tk.Entry(self.rent_form_frame, width=15)
+        self.date3_entry.grid(row=3, column=1)
+
         tk.Label(self.rent_form_frame, text="Duration (months):").grid(
-            row=3, column=0)
-        self.duration_entry = tk.Entry(self.rent_form_frame)
-        self.duration_entry.grid(row=3, column=1)
+            row=4, column=0, sticky="e"
+        )
+        self.duration_entry = tk.Entry(self.rent_form_frame, width=15)
+        self.duration_entry.grid(row=4, column=1)
 
         self.rent_button = tk.Button(
             self.rent_form_frame, text="Rent Spot", command=self.rent_spot
         )
-        self.rent_button.grid(row=4, column=0, columnspan=2, pady=5)
+        self.rent_button.grid(row=5, column=0, columnspan=2, pady=5)
 
     def select_spot(self, spot_index, spot_type):
         if self.selected_button:
@@ -140,17 +178,20 @@ class ParkingApp:
             return
 
         # Highlight the selected button
-        self.selected_button.config(
-            highlightbackground="black", highlightthickness=3)
+        self.selected_button.config(highlightbackground="black", highlightthickness=3)
         self.selected_spot = (spot_type, spot_index)
 
     def park_car(self):
         license_plate = self.license1_entry.get()
-        date_str = self.date_entry.get()
-        time_str = self.time_entry.get()
+        date_str = self.date1_entry.get()
+        time_str = self.time1_entry.get()
+
+        if not license_plate:
+            messagebox.showerror("Error", "Please fill the license plate!")
+            return
 
         if date_str and time_str:
-            datetime_str = f"{date_str} {time_str}" 
+            datetime_str = f"{date_str} {time_str}"
             dt_object = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
         else:
             dt_object = datetime.now()
@@ -168,8 +209,8 @@ class ParkingApp:
 
         # Clear the input fields
         self.license1_entry.delete(0, tk.END)
-        self.date_entry.delete(0, tk.END)
-        self.time_entry.delete(0, tk.END)
+        self.date1_entry.delete(0, tk.END)
+        self.time1_entry.delete(0, tk.END)
 
     def remove_car(self):
         if self.selected_spot is None:
@@ -189,7 +230,7 @@ class ParkingApp:
         self.selected_button = None
 
     def rent_spot(self):
-        license = self.license2_entry.get()
+        license = self.license3_entry.get()
         driver_name = self.driver_name_entry.get()
         spot = self.spot_entry.get()
         duration = self.duration_entry.get()
@@ -198,20 +239,20 @@ class ParkingApp:
             messagebox.showerror("Error", "Please fill the form.")
             return
 
-        vec = data.Vehicle(license, int(spot), driver_name,
-                           True, time.time(), int(duration))
+        vec = data.Vehicle(
+            license, int(spot), driver_name, True, time.time(), int(duration)
+        )
 
         if self.parking.rent_spot(vec):
             messagebox.showinfo("Success", "Spot rented successfully!")
         else:
-            messagebox.showerror(
-                "Error", "Failed to rent the spot. Please try again.")
+            messagebox.showerror("Error", "Failed to rent the spot. Please try again.")
 
         self.update_hourly_parking_ui()
         self.update_monthly_parking_ui()
 
         # Clear the rent form
-        self.license2_entry.delete(0, tk.END)
+        self.license3_entry.delete(0, tk.END)
         self.driver_name_entry.delete(0, tk.END)
         self.spot_entry.delete(0, tk.END)
         self.duration_entry.delete(0, tk.END)
