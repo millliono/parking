@@ -31,13 +31,11 @@ class ParkingApp:
                 self.hourly_frame,
                 text="Empty",
                 bg="green",
-                width=8,  # Reduced width
-                height=2,  # Reduced height
+                width=8,
+                height=2,
                 command=lambda i=i: self.select_spot(i, "hourly"),
             )
-            button.grid(
-                row=(i // 5) + 1, column=i % 5, padx=2, pady=2
-            )  # Reduced padding
+            button.grid(row=(i // 5) + 1, column=i % 5, padx=2, pady=2)
             self.hourly_buttons.append(button)
 
         # Frame for monthly parking spots
@@ -54,18 +52,14 @@ class ParkingApp:
                 self.monthly_frame,
                 text="Empty",
                 bg="blue",
-                width=8,  # Reduced width
-                height=2,  # Reduced height
+                width=8,
+                height=2,
                 command=lambda i=i: self.select_spot(i, "subscription"),
             )
-            button.grid(
-                row=(i // 5) + 1, column=i % 5, padx=2, pady=2
-            )  # Reduced padding
+            button.grid(row=(i // 5) + 1, column=i % 5, padx=2, pady=2)
             self.monthly_buttons.append(button)
 
-            legend = tk.Label(
-                self.monthly_frame, text="", font=("Arial", 10)
-            )  # Smaller font
+            legend = tk.Label(self.monthly_frame, text="", font=("Arial", 10))
             legend.grid(row=(i // 5) + 2, column=i % 5)
             self.monthly_legends.append(legend)
 
@@ -310,11 +304,10 @@ class ParkingApp:
                     button.config(bg="grey", text=spot["vehicle"].license)
                 else:
                     button.config(bg="blue", text="Empty")
-                legend.config(text=spot["vehicle"].license)  
+                legend.config(text=spot["vehicle"].license)
             else:
                 button.config(bg="blue", text="Empty")
-                legend.config(text="") 
-
+                legend.config(text="")
 
 
 if __name__ == "__main__":
