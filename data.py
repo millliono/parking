@@ -1,5 +1,7 @@
 class Vehicle:
-    def __init__(self, license, spot=None, driver_name=None, is_sub=False, datetime=None):
+    def __init__(
+        self, license, spot=None, driver_name=None, is_sub=False, datetime=None
+    ):
         self.license = license
         self.spot = spot
         self.driver_name = driver_name
@@ -14,12 +16,13 @@ class Vehicle:
     def __repr__(self):
         return f"Vehicle(license='{self.license}')"
 
+
 class ParkingSpace:
     def __init__(self):
         # Initialize a parking space with all spots empty
         self.hourly = [False] * 15  # False means empty
         self.subscription = [{"occupied": False, "vehicle": False} for _ in range(5)]
-        self.profit = {} 
+        self.profit = {}
 
     def park(self, license, datetime):
         reg = self.find_registered(license)

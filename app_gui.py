@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import data
+import helpers
 from datetime import datetime
 
 
@@ -309,8 +310,14 @@ class ParkingApp:
                 button.config(bg="blue", text="Empty")
                 legend.config(text="")
 
+    def on_closing(self):
+        helpers.save_parking_to_csv(self.parking.hourly, self.parking.subscription)
+        messagebox.showinfo("Success", "Saved Parking to csv.")
+        root.destroy()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = ParkingApp(root)
+    root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
