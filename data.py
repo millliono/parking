@@ -1,5 +1,6 @@
 import helpers
 
+
 class Vehicle:
     def __init__(
         self, license, spot=None, driver_name=None, is_sub=False, datetime=None
@@ -36,7 +37,9 @@ class ParkingSpace:
                 "Monthly",
                 "Parked",
                 self.subscription[reg]["vehicle"].spot,
-                self.subscription[reg]["vehicle"].datetime,
+                self.subscription[reg]["vehicle"].datetime.strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                ),
                 f"${0.0}",
             )
         else:
@@ -52,7 +55,7 @@ class ParkingSpace:
                         "Hourly",
                         "Parked",
                         vec.spot,
-                        vec.datetime,
+                        vec.datetime.strftime("%Y-%m-%d %H:%M:%S"),
                         f"${0.0}",
                     )
                     return
@@ -75,7 +78,7 @@ class ParkingSpace:
                 "Monthly",
                 "Rented",
                 vehicle.spot,
-                vehicle.datetime,
+                vehicle.datetime.strftime("%Y-%m-%d %H:%M:%S"),
                 f"${self.profit[date_key]:.2f}",
             )
             return True
@@ -91,7 +94,9 @@ class ParkingSpace:
                 "Monthly",
                 "Pulled-out",
                 self.subscription[spot]["vehicle"].spot,
-                self.subscription[spot]["vehicle"].datetime,
+                self.subscription[spot]["vehicle"].datetime.strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                ),
                 f"${0.0}",
             )
         elif spot_type == "hourly":
@@ -104,7 +109,7 @@ class ParkingSpace:
                 "Hourly",
                 "Pulled-Out",
                 self.hourly[spot].spot,
-                self.hourly[spot].datetime,
+                self.hourly[spot].datetime.strftime("%Y-%m-%d %H:%M:%S"),
                 f"${self.profit[date_key]:.2f}",
             )
             self.hourly[spot] = False
